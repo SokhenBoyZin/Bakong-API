@@ -12,7 +12,6 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-
 BAKONG_ACCOUNT_ID = os.getenv("BAKONG_ACCOUNT_ID")
 
 BAKONG_MERCHANT_NAME = os.getenv(
@@ -36,17 +35,17 @@ BAKONG_TOKEN = os.getenv("BAKONG_TOKEN")
 
 if not BAKONG_ACCOUNT_ID:
     raise RuntimeError(
-        "BAKONG_ACCOUNT_ID is missing from .env"
+        "BAKONG_ACCOUNT_ID is missing"
     )
 
 if not BAKONG_TOKEN:
     raise RuntimeError(
-        "BAKONG_TOKEN is missing from .env"
+        "BAKONG_TOKEN is missing"
     )
 
 if not BAKONG_PHONE:
     raise RuntimeError(
-        "BAKONG_PHONE is missing from .env"
+        "BAKONG_PHONE is missing"
     )
 
 
@@ -56,7 +55,23 @@ if not BAKONG_PHONE:
 
 app = Flask(__name__)
 
-CORS(app)
+
+# =========================================================
+# CORS
+# =========================================================
+
+CORS(
+    app,
+    resources={
+        r"/api/*": {
+            "origins": [
+                "https://e-shop-website-delta.vercel.app",
+                "http://localhost:3000",
+                "http://localhost:3001"
+            ]
+        }
+    }
+)
 
 
 # =========================================================
@@ -81,6 +96,7 @@ TRANSACTIONS = {}
 def health_check():
 
     return jsonify({
+        "success": True,
         "status": "healthy",
         "service": "iOne Store Bakong Payment Service"
     })
@@ -222,17 +238,11 @@ def generate_qr():
         # -------------------------------------------------
 
         TRANSACTIONS[md5] = {
-
             "amount": amount,
-
             "currency": currency,
-
             "description": description,
-
             "status": "UNPAID",
-
             "bill_number": bill_number
-
         }
 
 
@@ -263,7 +273,6 @@ def generate_qr():
         print("GENERATE QR ERROR")
         print(str(e))
         print("================================")
-
 
         return jsonify({
 
@@ -392,7 +401,6 @@ def check_payment():
         print(str(e))
         print("================================")
 
-
         return jsonify({
 
             "success": False,
@@ -440,7 +448,6 @@ if __name__ == "__main__":
     print("================================")
     print("Server running on port 5000")
     print("================================")
-
 
     app.run(
         host="0.0.0.0",
